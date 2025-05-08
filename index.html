@@ -1,31 +1,159 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>给[名字]的表白</title>
+    <title>慢速版粒子爱心</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #ffebee;
-            padding: 50px;
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
         }
-        h1 {
-            color: #d81b60;
-        }
-        .heart {
-            font-size: 100px;
-            color: red;
-            animation: beat 1s infinite alternate;
-        }
-        @keyframes beat {
-            to { transform: scale(1.2); }
+        canvas {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="heart">❤️</div>
-    <h1>[你的名字]喜欢[TA的名字]</h1>
-    <p>从遇见你的那一刻起，我的心就只为你跳动...</p>
-    <!-- 可以添加更多内容 -->
+    <canvas id="heartCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置画布大小并居中爱心
+        canvas.width = 800;
+        canvas.height = 700;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        
+        // 原有函数保持不变...
+        const tFunc = (n) => {
+            const result = [];
+            for (let i = 0; i < n; i++) {
+                result.push(Math.random() * Math.PI * (2 - 12e-2) + Math.PI * 6e-2 + Math.PI);
+            }
+            return result;
+        };
+        
+        const dFunc = (t) => t.filter(val => val > 2 * Math.PI + 2e-1 || val < 2 * Math.PI - 2e-1);
+        
+        const xFunc = (t) => 16 * Math.pow(Math.sin(t), 3);
+        const yFunc = (t) => 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        
+        const sFunc = (x, y, b) => {
+            const newX = b * Math.log(Math.random()) * x + x;
+            const newY = b * Math.log(Math.random()) * y + y;
+            return [newX, newY];
+        };
+        
+        const rFunc1 = (x, y, r) => {
+            const norm = Math.sqrt(x*x + y*y);
+            const factor = r / 1.2 / Math.pow(norm + 1, 1.8);
+            return [
+                factor * x + x + (Math.random() / 10),
+                factor * y + y + (Math.random() / 10)
+            ];
+        };
+        
+        const rFunc2 = (x, y, r) => {
+            const norm = Math.sqrt(x*x + y*y);
+            const factor = r / 1.2 / Math.pow(norm + 1, 1.8);
+            return [
+                factor * x + x,
+                factor * y + y
+            ];
+        };
+        
+        // 生成粒子数据
+        const t1 = dFunc(tFunc(4000));
+        const t2 = dFunc(tFunc(2000));
+        const t3 = dFunc(tFunc(2000));
+        
+        let x0 = [], y0 = [];
+        
+        for (let i = 0; i < t1.length; i++) {
+            const [x, y] = sFunc(xFunc(t1[i]), yFunc(t1[i]), 0.05);
+            x0.push(x);
+            y0.push(y);
+        }
+        const L1 = x0.length;
+        
+        for (let i = 0; i < t2.length; i++) {
+            const [x, y] = sFunc(xFunc(t2[i]), yFunc(t2[i]), 0.15);
+            x0.push(x);
+            y0.push(y);
+        }
+        const L2 = x0.length;
+        
+        for (let i = 0; i < t3.length; i++) {
+            const [x, y] = sFunc(xFunc(t3[i]) * 1.4, yFunc(t3[i]) * 1.4, 0.18);
+            x0.push(x);
+            y0.push(y);
+        }
+        
+        const cFunc = (n) => {
+            const colors = [];
+            const base = [255/255, 158/255, 196/255];
+            const variation = [-39/255, -81/255, -56/255];
+            
+            for (let i = 0; i < n; i++) {
+                const r = base[0] + variation[0] * Math.random();
+                const g = base[1] + variation[1] * Math.random();
+                const b = base[2] + variation[2] * Math.random();
+                colors.push(`rgb(${Math.floor(r*255)}, ${Math.floor(g*255)}, ${Math.floor(b*255)})`);
+            }
+            return colors;
+        };
+        
+        const colors = cFunc(x0.length);
+        
+        // 动画循环 - 主要修改以下参数
+        let frameCount = 0;
+        const speedFactor = 0.5; // 减小这个值会使动画更慢
+        
+        function animate() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const x = [], y = [];
+            
+            // 修改了这里的时间参数，除以更大的值使动作变慢
+            const currentTime = frameCount * speedFactor;
+            
+            for (let i = 0; i < L1; i++) {
+                const [newX, newY] = rFunc2(x0[i], y0[i], 10 * Math.sin(currentTime/15 * Math.PI)); // 从10改为15
+                x.push(newX);
+                y.push(newY);
+            }
+            
+            for (let i = L1; i < L2; i++) {
+                const [newX, newY] = rFunc1(x0[i], y0[i], 10 * Math.sin(currentTime/15 * Math.PI)); // 从10改为15
+                x.push(newX);
+                y.push(newY);
+            }
+            
+            for (let i = L2; i < x0.length; i++) {
+                const [newX, newY] = rFunc1(x0[i], y0[i], 10 * Math.sin((currentTime+10)/15 * Math.PI)); // 从10改为15
+                x.push(newX);
+                y.push(newY);
+            }
+            
+            for (let i = 0; i < x.length; i++) {
+                const screenX = x[i] * 15 + centerX;
+                const screenY = -y[i] * 15 + centerY;
+                
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+            }
+            
+            frameCount++;
+            requestAnimationFrame(animate);
+        }
+        
+        console.log('粒子爱心效果 by slandarer - 慢速版');
+        animate();
+    </script>
 </body>
 </html>
