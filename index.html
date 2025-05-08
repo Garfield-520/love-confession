@@ -23,7 +23,7 @@
         // 设置画布大小并居中爱心
         canvas.width = 800;
         canvas.height = 800;
-        const centerX = canvas.width / 2;
+        const centerX = canvas.width / 2 + 100;
         const centerY = canvas.height / 2;
         
         // 原有函数保持不变...
@@ -109,7 +109,7 @@
         
         // 动画循环 - 主要修改以下参数
         let frameCount = 0;
-        const speedFactor = 0.1; // 减小这个值会使动画更慢
+        const speedFactor = 0.3; // 减小这个值会使动画更慢
         
         function animate() {
             ctx.fillStyle = 'black';
