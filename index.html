@@ -7,33 +7,14 @@
             margin: 0;
             overflow: hidden;
             background-color: black;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
         }
         canvas {
             display: block;
-        }
-        .text {
-            color: #ff9ec4;
-            font-family: Arial, sans-serif;
-            font-size: 40px;
-            margin-top: 30px;
-            text-align: center;
-            animation: blink 1.5s infinite;
-        }
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <canvas id="heartCanvas"></canvas>
-    <div class="text">W C L & W T J</div>
 
     <script>
         const canvas = document.getElementById('heartCanvas');
